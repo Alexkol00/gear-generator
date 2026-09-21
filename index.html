@@ -1,0 +1,1459 @@
+]<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Шестерня Ø50 · z28 — параметрика · пара · STL/3MF/OBJ/PLY/GLB/DXF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#141518; --line:#26282d; --txt:#e7e5df; --mut:#8b8e95; --amber:#f0a43a; --red:#e06c5a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    overflow:hidden; color:var(--txt);
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    background-color:var(--bg);
+    background-image:radial-gradient(#1f2126 1px, transparent 1.4px);
+    background-size:26px 26px;
+  }
+  #scene{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+  #panel{
+    position:fixed;left:18px;top:18px;bottom:18px;width:312px;z-index:10;
+    display:flex;flex-direction:column;overflow-y:auto;
+    background:rgba(19,20,23,.86);border:1px solid var(--line);
+    backdrop-filter:blur(12px);
+  }
+  #panel::-webkit-scrollbar{width:6px}
+  #panel::-webkit-scrollbar-thumb{background:#2c2e33}
+  .panel-head{padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+  .t1{font-size:10px;letter-spacing:.18em;color:var(--mut)}
+  .big{font-size:25px;font-weight:700;margin-top:8px;letter-spacing:.02em}
+  .big .dim{color:var(--mut);font-weight:400}
+  .big .sep{color:#3a3d43;margin:0 6px;font-weight:400}
+  .big .unit{font-size:11px;color:var(--mut);font-weight:400;margin-left:8px}
+  .t3{font-size:10px;color:var(--mut);margin-top:7px;letter-spacing:.05em}
+  section{padding:14px 18px 16px;border-bottom:1px solid var(--line)}
+  h3{font-size:10px;letter-spacing:.22em;color:var(--mut);font-weight:500;margin-bottom:13px;text-transform:uppercase}
+  h3 b{color:var(--amber);font-weight:700}
+  .row{display:grid;grid-template-columns:100px 1fr 56px;align-items:center;gap:9px;margin-bottom:11px}
+  .row:last-child{margin-bottom:0}
+  .row label{font-size:11px}
+  .row.seg-row{grid-template-columns:100px 1fr}
+  .row output{font-size:11px;color:var(--amber);text-align:right}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;cursor:ew-resize}
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:#33363c}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;margin-top:-4.5px;background:var(--txt);border:1px solid #000;border-radius:0}
+  input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-slider-thumb{background:var(--amber)}
+  input[type=range]::-moz-range-track{height:2px;background:#33363c}
+  input[type=range]::-moz-range-thumb{width:10px;height:10px;background:var(--txt);border:1px solid #000;border-radius:0}
+  input[type=range]:hover::-moz-range-thumb{background:var(--amber)}
+  input[type=number]{
+    width:100%;padding:5px 6px;background:#1b1d21;border:1px solid var(--line);
+    color:var(--amber);font:11px 'JetBrains Mono',monospace;text-align:right;outline:none;
+  }
+  input[type=number]:hover{border-color:#3a3d43}
+  input[type=number]:focus{border-color:var(--amber);background:#211f18}
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield;appearance:textfield}
+  .hint{font-size:9.5px;color:#c98a3a;line-height:1.55;margin:-3px 0 11px}
+  .presets{display:flex;gap:4px;margin:-3px 0 12px}
+  .presets button{flex:1;background:none;border:1px solid var(--line);color:var(--mut);
+    font:10px 'JetBrains Mono',monospace;padding:5px 0;cursor:pointer}
+  .presets button:hover{color:var(--txt)}
+  .presets button.on{background:#242629;color:var(--amber);border-color:#3a3d43}
+  .chk{display:flex;align-items:center;gap:10px;font-size:11px;cursor:pointer;user-select:none;margin-bottom:8px}
+  .chk input{display:none}
+  .chk .box{width:13px;height:13px;border:1px solid #45484f;position:relative;flex:none}
+  .chk input:checked + .box::after{content:'';position:absolute;inset:2px;background:var(--amber)}
+  .chk input:disabled + .box{opacity:.25}
+  .chk.disabled{opacity:.45;cursor:default}
+  .pair-body{transition:opacity .15s}
+  .pair-body.off{opacity:.35;pointer-events:none}
+  .mini{font-size:9.5px;color:#c98a3a;margin:2px 0 10px 23px;display:none;letter-spacing:.03em}
+  .mini.show{display:block}
+  .seg{display:flex;border:1px solid var(--line)}
+  .seg button{flex:1;background:none;border:none;border-right:1px solid var(--line);color:var(--mut);font:11px 'JetBrains Mono',monospace;padding:6px 0;cursor:pointer;white-space:nowrap}
+  .seg button:last-child{border-right:none}
+  .seg button:hover{color:var(--txt)}
+  .seg button.on{background:#242629;color:var(--amber)}
+  .fmt{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+  .fmt button{background:none;border:1px solid var(--line);color:var(--mut);font:11px 'JetBrains Mono',monospace;padding:8px 0;cursor:pointer}
+  .fmt button:hover{color:var(--txt)}
+  .fmt button.on{background:#242629;color:var(--amber);border-color:#3a3d43}
+  #expDesc{font-size:9.5px;line-height:1.6;color:var(--mut);margin-bottom:11px;min-height:30px}
+  #iframeNote{display:none;margin-bottom:11px;padding:9px 11px;border:1px solid #5a4a2a;background:#1d1a12;color:#d8b36a;font-size:9.5px;line-height:1.55}
+  .btn-stl{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:11px 0;
+    background:var(--amber);border:1px solid #000;color:#17140e;
+    font:700 12px 'JetBrains Mono',monospace;letter-spacing:.1em;cursor:pointer;
+    transition:background .12s, transform .1s}
+  .btn-stl:hover{background:#ffb95a}
+  .btn-stl:active{transform:translateY(1px)}
+  .btn-stl[disabled]{opacity:.55;cursor:progress}
+  .btn-stl svg{width:13px;height:13px}
+  #saveAlt{display:none;margin-top:8px;font-size:10px}
+  #saveAlt a{color:var(--mut)}
+  #saveAlt a:hover{color:var(--amber)}
+  #expTrisLine{font-size:10px;color:var(--mut);margin-top:10px}
+  #expTrisLine b{color:var(--txt);font-weight:500}
+  #expInfo{margin-top:6px;font-size:10px;line-height:1.7;color:var(--mut);word-break:break-all}
+  #expInfo.ok{color:var(--amber)}
+  #expInfo.err{color:var(--red)}
+  #expInfo a{color:var(--amber);text-decoration:underline}
+  #expInfo .dl-hint{color:var(--mut);font-size:9.5px;margin-top:4px}
+  .spec dl{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:11px}
+  .spec dt{color:var(--mut)}
+  .spec dd{text-align:right}
+  .stamp{margin-top:auto;padding:12px 18px;display:flex;justify-content:space-between;font-size:9px;letter-spacing:.14em;color:#5c6066;border-top:1px solid var(--line)}
+
+  #hint{position:fixed;right:22px;bottom:18px;z-index:10;font-size:10px;letter-spacing:.08em;color:#6a6e75;text-align:right;line-height:1.7}
+  #loader{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:var(--bg);font-size:12px;letter-spacing:.22em;color:var(--mut);transition:opacity .5s}
+  #loader.off{opacity:0;pointer-events:none}
+  #loader i{font-style:normal;color:var(--amber);animation:blink 1s steps(2) infinite;margin-left:6px}
+  @keyframes blink{50%{opacity:0}}
+  #fatal{display:none;position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:60;
+    max-width:72vw;padding:10px 16px;background:#241417;border:1px solid #5a3229;color:var(--red);font-size:11px;line-height:1.6}
+
+  @media (max-width:760px){
+    #panel{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:50vh}
+    #hint{display:none}
+  }
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<aside id="panel">
+  <div class="panel-head">
+    <div class="t1">ЦИЛИНДРИЧЕСКОЕ ПРЯМОЗУБОЕ КОЛЕСО</div>
+    <div class="big"><span class="dim">Ø</span><span id="bigD">50</span><span class="sep">·</span><span class="dim">z</span><span id="bigZ">28</span><span class="unit">мм</span></div>
+    <!-- ВАЖНО: span#headA — статичный, его innerHTML нигде не перезаписывается
+         (именно это раньше вызывало null.textContent на второй пересборке) -->
+    <div class="t3">эвольвента · α <span id="headA">20</span>° · ГОСТ 13755<span id="headPair"></span></div>
+  </div>
+
+  <section>
+    <h3>Геометрия зацепления</h3>
+    <div class="row"><label>зубьев, z</label><input type="range" id="inZ" min="6" max="120" step="1" value="28"><input type="number" id="numZ" min="6" max="120" step="1" value="28"></div>
+    <div class="row"><label>диам. вершин</label><input type="range" id="inDa" min="10" max="200" step="0.1" value="50"><input type="number" id="numDa" min="10" max="200" step="0.1" value="50"></div>
+    <div class="row"><label>ширина венца</label><input type="range" id="inB" min="2" max="40" step="0.1" value="8"><input type="number" id="numB" min="2" max="40" step="0.1" value="8"></div>
+    <div class="row"><label>смещение x</label><input type="range" id="inX" min="-0.5" max="1" step="0.01" value="0"><input type="number" id="numX" min="-0.5" max="1" step="0.01" value="0"></div>
+    <div class="row"><label>зазор, мм</label><input type="range" id="inBk" min="0" max="0.5" step="0.05" value="0.1"><input type="number" id="numBk" min="0" max="0.5" step="0.05" value="0.1"></div>
+    <div class="row seg-row"><label>угол профиля α</label>
+      <div class="seg" id="segA"><button type="button" data-v="14.5">14.5°</button><button type="button" data-v="20" class="on">20°</button><button type="button" data-v="25">25°</button></div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Ответное колесо</h3>
+    <label class="chk"><input type="checkbox" id="cbPair"><span class="box"></span>пара: второе колесо в зацеплении</label>
+    <div class="pair-body off" id="pairBody">
+      <div class="row"><label>зубьев, z₂</label><input type="range" id="qZs" min="6" max="120" step="1" value="16"><input type="number" id="qZn" min="6" max="120" step="1" value="16"></div>
+      <div class="row"><label>отв. вала Ø₂</label><input type="range" id="qBs" min="1" max="40" step="0.1" value="3.2"><input type="number" id="qBn" min="1" max="40" step="0.1" value="3.2"></div>
+      <div class="presets" id="presetsShaftQ">
+        <button type="button" data-v="2">2</button><button type="button" data-v="3">3</button><button type="button" data-v="3.2" class="on">3.2</button><button type="button" data-v="4">4</button><button type="button" data-v="5">5</button><button type="button" data-v="6">6</button><button type="button" data-v="8">8</button>
+      </div>
+      <div class="row"><label>ширина венца</label><input type="range" id="qWs" min="2" max="30" step="0.5" value="6"><input type="number" id="qWn" min="2" max="30" step="0.5" value="6"></div>
+      <div class="row"><label>Ø ступицы</label><input type="range" id="qHs" min="6" max="80" step="0.5" value="10"><input type="number" id="qHn" min="6" max="80" step="0.5" value="10"></div>
+      <div class="row"><label>высота ступ.</label><input type="range" id="qRs" min="0" max="20" step="0.5" value="2"><input type="number" id="qRn" min="0" max="20" step="0.5" value="2"></div>
+      <div class="row"><label>угол положения</label><input type="range" id="qAng" min="0" max="360" step="1" value="0"><output id="outAng">0°</output></div>
+      <div class="row seg-row"><label>материал</label>
+        <div class="seg" id="segMatQ"><button type="button" data-v="steel">сталь</button><button type="button" data-v="wood">дерево</button><button type="button" data-v="brass" class="on">латунь</button><button type="button" data-v="polymer">пласт</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Отверстие и ступица <b>главного</b></h3>
+    <div class="row"><label>отв. вала Ø</label><input type="range" id="inBore" min="1" max="60" step="0.1" value="3.2"><input type="number" id="numBore" min="1" max="60" step="0.1" value="3.2"></div>
+    <div class="presets" id="presetsShaft">
+      <button type="button" data-v="2">2</button><button type="button" data-v="3">3</button><button type="button" data-v="3.2" class="on">3.2</button><button type="button" data-v="4">4</button><button type="button" data-v="5">5</button><button type="button" data-v="6">6</button><button type="button" data-v="8">8</button>
+    </div>
+    <div class="hint">посадка на вал: для FDM берите Ø вала +0,1…0,3 мм на усадку; для прессовой посадки — ровно Ø вала</div>
+    <div class="row"><label>конусность, °</label><input type="range" id="inTaper" min="0" max="15" step="0.25" value="0"><input type="number" id="numTaper" min="0" max="15" step="0.25" value="0"></div>
+    <div class="row seg-row"><label>сужение к</label>
+      <div class="seg" id="segTd"><button type="button" data-v="top" class="on">верху</button><button type="button" data-v="bottom">низу</button></div>
+    </div>
+    <label class="chk" id="wrapKey"><input type="checkbox" id="cbKey" checked><span class="box"></span>шпоночный паз</label>
+    <div class="mini" id="keyNote"></div>
+    <div class="row"><label>Ø ступицы</label><input type="range" id="inHub" min="6" max="200" step="0.5" value="15"><input type="number" id="numHub" min="6" max="200" step="0.5" value="15"></div>
+    <div class="row"><label>высота ступицы</label><input type="range" id="inRise" min="0" max="30" step="0.5" value="3"><input type="number" id="numRise" min="0" max="30" step="0.5" value="3"></div>
+    <div class="row seg-row"><label>отв. в диске</label>
+      <div class="seg" id="segH"><button type="button" data-v="0">нет</button><button type="button" data-v="3">3</button><button type="button" data-v="4">4</button><button type="button" data-v="5">5</button><button type="button" data-v="6" class="on">6</button><button type="button" data-v="8">8</button></div>
+    </div>
+    <div class="row"><label>Ø отверстий</label><input type="range" id="inHole" min="1" max="40" step="0.1" value="6.5"><input type="number" id="numHole" min="1" max="40" step="0.1" value="6.5"></div>
+  </section>
+
+  <section>
+    <h3>Материал и сцена</h3>
+    <div class="row seg-row" style="margin-bottom:12px"><label>материал главн.</label>
+      <div class="seg" id="segM"><button type="button" data-v="steel" class="on">сталь</button><button type="button" data-v="wood">дерево</button><button type="button" data-v="brass">латунь</button><button type="button" data-v="polymer">пласт</button></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="cbSpin" checked><span class="box"></span>вращение</label>
+    <div class="row"><label>скорость, об/мин</label><input type="range" id="inRpm" min="0" max="60" step="1" value="8"><input type="number" id="numRpm" min="0" max="60" step="1" value="8"></div>
+    <label class="chk"><input type="checkbox" id="cbPause"><span class="box"></span>пауза (ручной режим)</label>
+    <div class="row"><label>поворот вручную</label><input type="range" id="inJog" min="0" max="360" step="1" value="0"><output id="outJog">0°</output></div>
+    <label class="chk"><input type="checkbox" id="cbDims" checked><span class="box"></span>размеры и оси</label>
+    <label class="chk"><input type="checkbox" id="cbMarks" checked><span class="box"></span>метки фазы</label>
+  </section>
+
+  <section>
+    <h3>Экспорт</h3>
+    <div id="iframeNote"><b>Обнаружен режим предпросмотра.</b> Встроенные окна и iframe часто блокируют загрузку файлов. Откройте эту страницу в отдельной вкладке браузера — либо после экспорта кликните ссылку на файл в статусе ниже (или правой кнопкой → «Сохранить ссылку как…»).</div>
+    <div class="fmt" id="segFmt">
+      <button type="button" data-v="stlb" class="on">STL·bin</button><button type="button" data-v="stla">STL·txt</button><button type="button" data-v="mf3">3MF</button><button type="button" data-v="obj">OBJ</button>
+      <button type="button" data-v="ply">PLY</button><button type="button" data-v="glb">GLB</button><button type="button" data-v="dxf">DXF</button>
+    </div>
+    <div class="row seg-row" style="margin-bottom:12px"><label>что сохранить</label>
+      <div class="seg" id="segWhat"><button type="button" data-v="main" class="on">главное</button><button type="button" data-v="both">пара</button><button type="button" data-v="second">второе</button></div>
+    </div>
+    <div id="expDesc"></div>
+    <button type="button" class="btn-stl" id="btnExport">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square">
+        <path d="M8 2v7.5M8 9.5L5.2 6.7M8 9.5l2.8-2.8M2.5 13.5h11"/>
+      </svg>
+      СКАЧАТЬ МОДЕЛЬ
+    </button>
+    <div id="saveAlt"></div>
+    <div id="expTrisLine">триангуляция: <b id="expTris">—</b> трег. · ось Z — вверх, низ на столе</div>
+    <div id="expInfo"></div>
+  </section>
+
+  <section class="spec">
+    <h3>Спецификация</h3>
+    <dl>
+      <dt>модуль m</dt><dd id="spM"></dd>
+      <dt>делит. диаметр d₁</dt><dd id="spD"></dd>
+      <dt>диам. вершин da₁</dt><dd id="spDa"></dd>
+      <dt>диам. впадин df₁</dt><dd id="spF"></dd>
+      <dt>базовый диаметр db₁</dt><dd id="spB"></dd>
+      <dt>окружной шаг p</dt><dd id="spP"></dd>
+      <dt>смещение x</dt><dd id="spX"></dd>
+      <dt>отв. Ø низ / верх</dt><dd id="spBo"></dd>
+      <dt>z₂ / Ø вершин da₂</dt><dd id="spQ2"></dd>
+      <dt>перед. отнош. i</dt><dd id="spI"></dd>
+      <dt>межосевое a</dt><dd id="spA"></dd>
+      <dt>полная высота</dt><dd id="spH"></dd>
+    </dl>
+  </section>
+
+  <div class="stamp"><span>1:1 · мм</span><span>STL·3MF·OBJ·PLY·GLB·DXF</span><span>ЛИСТ 1</span></div>
+</aside>
+
+<div id="hint">левая кнопка — орбита · колесо — масштаб · правая — панорама<br>двойной клик — сброс камеры</div>
+<div id="loader"><span>ПОСТРОЕНИЕ ЭВОЛЬВЕНТНОГО ПРОФИЛЯ<i>▮</i></span></div>
+<div id="fatal"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ===== эти объявления идут ПЕРВЫМИ — раньше любого кода, который их тронет ===== */
+let introActive = true, introT = 0;
+const introFrom = new THREE.Vector3();
+
+const AMBER = 0xf0a43a;
+const DEG = Math.PI/180;
+const $ = id => document.getElementById(id);
+const clamp = THREE.MathUtils.clamp;
+
+function showFatal(m){
+  const f = $('fatal');
+  f.style.display = 'block';
+  f.textContent = 'Ошибка: ' + m;
+  console.error(m);
+}
+addEventListener('error', e => showFatal(e.message || 'неизвестная ошибка'));
+addEventListener('unhandledrejection', e => showFatal(e.reason?.message || String(e.reason)));
+
+(function(){
+  let framed = false;
+  try{ framed = window.self !== window.top; }catch(e){ framed = true; }
+  if (framed) $('iframeNote').style.display = 'block';
+})();
+
+/* ===== параметры ===== */
+const P = {   /* главное колесо */
+  z:28, da:50, b:8, alpha:20, x:0,
+  bore:3.2, taper:0, tDir:'top', key:true, hubD:15, rise:3, holes:6, holeD:6.5,
+  rpm:8, spin:true, dims:true, marks:true, mat:'steel', fmt:'stlb'
+};
+const Q = {   /* ответное колесо */
+  on:false, z:16, bore:3.2, b:6, hubD:10, rise:2, mat:'brass', angle:0
+};
+const R = { backlash:0.1, jog:0, paused:false, what:'main' };
+
+let D = null, E = null;       /* производные главного */
+let Dq = null, Eq = null;     /* производные второго */
+let ph1 = 0;                  /* накопленная фаза главного, рад */
+let lastKey = '';
+
+/* ================= ГЕОМЕТРИЯ ================= */
+function deriveMain(){
+  const alpha = P.alpha * DEG;
+  const m  = P.da / (P.z + 2 + 2*P.x);
+  const rd = m * P.z / 2;
+  const ra = P.da / 2;
+  const rf = m * (P.z - 2.5 + 2*P.x) / 2;
+  const rb = rd * Math.cos(alpha);
+  const psi = (Math.PI/2 + 2*P.x*Math.tan(alpha)) / P.z;
+  return { alpha, m, rd, ra, rf, rb, psi };
+}
+function deriveSecond(){
+  const alpha = D.alpha, m = D.m;      /* тот же модуль — условие зацепления */
+  const rd = m * Q.z / 2;
+  const ra = rd + m;
+  const rf = rd - 1.25*m;
+  const rb = rd * Math.cos(alpha);
+  const psi = (Math.PI/2) / Q.z;
+  return { alpha, m, rd, ra, rf, rb, psi };
+}
+
+function resolveGear(cfg, Dv){
+  const H   = cfg.rise >= 0.5 ? cfg.b + 2*cfg.rise : cfg.b;
+  const bev = Math.min(0.4, Dv.m * 0.35);
+  const boreMax = Math.max(1.6, 2*(Dv.rf - 1));
+  const bore = clamp(cfg.bore, 1, boreMax);
+  cfg.bore = bore;
+
+  let beta = Math.min(cfg.taper || 0, 15) * DEG;
+  const bMax = Math.atan(Math.max(0, bore/2 - 0.4) / Math.max(H/2, 0.5));
+  if (beta > bMax) beta = bMax;
+  const tanB = Math.tan(beta);
+  const dirSign = (cfg.tDir === 'bottom') ? 1 : -1;
+  const dLo = bore - dirSign*tanB*H;
+  const dHi = bore + dirSign*tanB*H;
+
+  const hubMaxDia = Math.max(bore + 4, 2*(Dv.rf - 1.5));
+  const hubR = clamp(cfg.hubD/2, bore/2 + 1.6, hubMaxDia/2);
+  cfg.hubD = hubR*2;
+
+  const keyOk = cfg.key && bore >= 6 && tanB <= 1e-4;
+  const keyOff = keyOk ? Math.min(Math.max(1.2, bore*0.16), Dv.rf - bore/2 - 1.2, hubR - 1 - bore/2) : 0;
+  const wk = keyOk && keyOff > 0.4;
+
+  const warpEdge  = Math.max(bore/2 + bev, bore/2 + tanB*H/2) + 0.05;
+  const innerEdge = Dv.rf - 2.2;
+  const innerBound = Math.max(hubR, warpEdge) + 0.35;
+  let nH = cfg.holes || 0, ringR = 0, holeR = 0;
+  if (nH > 0){
+    ringR = (hubR + innerEdge)/2;
+    holeR = Math.min(cfg.holeD/2, ringR - innerBound, innerEdge - ringR - 1.2);
+    if (holeR < 0.6){ nH = 0; holeR = 0; ringR = 0; }
+  }
+  return { H, bev, bore, tanB, dirSign, dLo, dHi, warpThr: bore/2 + bev + 0.01,
+           hubR, wk, keyW: wk ? Math.min(Math.max(bore*0.28, 1.8), bore*0.45) : 0,
+           keyTop: bore/2 + keyOff, nH, ringR, holeR, hubH: H, lift: H/2 };
+}
+
+function gearOutline(raS, rfS, rb, z, alpha, psi){
+  const inv = t => Math.tan(t) - t, invA = inv(alpha);
+  const step = 2*Math.PI/z;
+  const cT = invA - (rfS > rb ? inv(Math.acos(Math.min(1, rb/rfS))) : 0);
+  psi = Math.max(0.006, Math.min(psi, (step - 0.03)/2 - cT));
+  const th = r => Math.max(r <= rb ? psi + invA
+                                   : psi + invA - inv(Math.acos(Math.min(1, rb/r))), 0.008);
+  const ta = Math.min(Math.max(th(raS), 0.012), step*0.45);
+  const tf = th(rfS);
+  const N = 9, M = 4, K = 6, pts = [];
+  for (let i = 0; i < z; i++){
+    const b0 = i*step;
+    for (let j = 0; j <= N; j++){ const r = rfS + (raS-rfS)*j/N, a = b0 - th(r);
+      pts.push(new THREE.Vector2(r*Math.cos(a), r*Math.sin(a))); }
+    for (let j = 1; j < M; j++){ const a = b0 - ta + 2*ta*j/M;
+      pts.push(new THREE.Vector2(raS*Math.cos(a), raS*Math.sin(a))); }
+    for (let j = 0; j <= N; j++){ const r = raS - (raS-rfS)*j/N, a = b0 + th(r);
+      pts.push(new THREE.Vector2(r*Math.cos(a), r*Math.sin(a))); }
+    for (let j = 1; j < K; j++){ const a = b0 + tf + (step - 2*tf)*j/K;
+      pts.push(new THREE.Vector2(rfS*Math.cos(a), rfS*Math.sin(a))); }
+  }
+  return pts;
+}
+function boreHole(r, w, top){
+  const p = new THREE.Path(), cx = w/2;
+  const cy = Math.sqrt(Math.max(r*r - cx*cx, 1e-4));
+  const a0 = Math.atan2(cy, cx), aEnd = -Math.PI - a0, S = 60;
+  p.moveTo(cx, cy);
+  for (let i = 1; i <= S; i++){
+    const a = a0 + (aEnd - a0)*i/S;
+    p.lineTo(r*Math.cos(a), r*Math.sin(a));
+  }
+  p.lineTo(-cx, top); p.lineTo(cx, top); p.closePath();
+  return p;
+}
+function circleHole(cx, cy, r){
+  const p = new THREE.Path();
+  p.absarc(cx, cy, r, 0, Math.PI*2, true);
+  return p;
+}
+function applyTaper(geo, E){
+  if (E.tanB <= 1e-6) return;
+  const p = geo.attributes.position;
+  for (let i = 0; i < p.count; i++){
+    const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    const r = Math.hypot(x, y);
+    if (r > E.warpThr || r < 1e-4) continue;
+    const s = Math.max(0.05, r + E.dirSign*E.tanB*z)/r;
+    p.setXYZ(i, x*s, y*s, z);
+  }
+  p.needsUpdate = true;
+  geo.computeVertexNormals();
+}
+function buildGearMeshes(Dv, Ev, cfg, mat){
+  const bev = Ev.bev, g = new THREE.Group();
+  const boreR = Ev.bore/2 + bev;
+  const mkBore = () => Ev.wk ? boreHole(boreR, Ev.keyW, Ev.keyTop) : circleHole(0, 0, boreR);
+
+  const shape = new THREE.Shape(gearOutline(Dv.ra - bev, Dv.rf + bev, Dv.rb, cfg.z, Dv.alpha, Dv.psi));
+  shape.holes.push(mkBore());
+  for (let i = 0; i < Ev.nH; i++){
+    const a = i/Ev.nH * 2*Math.PI;
+    shape.holes.push(circleHole(Ev.ringR*Math.cos(a), Ev.ringR*Math.sin(a), Ev.holeR + bev));
+  }
+  const plateGeo = new THREE.ExtrudeGeometry(shape, {
+    depth: cfg.b - 2*bev, bevelEnabled:true, bevelThickness:bev, bevelSize:bev,
+    bevelSegments:2, steps:1, curveSegments:48
+  });
+  plateGeo.translate(0, 0, -(cfg.b - 2*bev)/2);
+  applyTaper(plateGeo, Ev);
+  g.add(new THREE.Mesh(plateGeo, mat));
+
+  if (cfg.rise >= 0.5){
+    const hubShape = new THREE.Shape();
+    hubShape.absarc(0, 0, Ev.hubR - bev, 0, Math.PI*2, false);
+    hubShape.holes.push(mkBore());
+    const hubGeo = new THREE.ExtrudeGeometry(hubShape, {
+      depth: Ev.hubH - 2*bev, bevelEnabled:true, bevelThickness:bev, bevelSize:bev,
+      bevelSegments:3, steps:1, curveSegments:48
+    });
+    hubGeo.translate(0, 0, -(Ev.hubH - 2*bev)/2);
+    applyTaper(hubGeo, Ev);
+    g.add(new THREE.Mesh(hubGeo, mat));
+  }
+  return g;
+}
+
+/* ================= МАТЕРИАЛЫ ================= */
+function makeWoodTexture(){
+  const s = 512, c = document.createElement('canvas');
+  c.width = c.height = s;
+  const g = c.getContext('2d');
+  g.fillStyle = '#b08052'; g.fillRect(0, 0, s, s);
+  const cx = s*0.72, cy = s*0.35;
+  for (let r = 8; r < s*1.5; r += 6 + Math.random()*7){
+    g.beginPath();
+    for (let a = 0; a <= 72; a++){
+      const t = a/72 * Math.PI*2;
+      const rr = r * (1 + 0.05*Math.sin(t*3 + r) + 0.03*Math.sin(t*7 + r*0.5));
+      const x = cx + Math.cos(t)*rr, y = cy + Math.sin(t)*rr*0.9;
+      a ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
+    g.strokeStyle = `rgba(90,58,34,${0.07 + Math.random()*0.1})`;
+    g.lineWidth = 1 + Math.random()*1.6;
+    g.stroke();
+  }
+  for (let i = 0; i < 380; i++){
+    const x = Math.random()*s;
+    g.strokeStyle = `rgba(${60+Math.random()*40|0},${38+Math.random()*24|0},${20+Math.random()*14|0},${0.04+Math.random()*0.07})`;
+    g.lineWidth = 0.6 + Math.random();
+    g.beginPath();
+    g.moveTo(x, 0);
+    g.bezierCurveTo(x+6, s*0.33, x-6, s*0.66, x+(Math.random()*10-5), s);
+    g.stroke();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  t.repeat.set(1/22, 1/22);
+  return t;
+}
+const woodTex = makeWoodTexture();
+const MATS = {
+  steel:   { color:0xb8bdc3, metalness:1,  roughness:.38, env:1.15, glb:0xb8bdc3 },
+  wood:    { color:0xffffff, metalness:0,  roughness:.6,  clearcoat:.25, ccr:.5, env:.55,
+             map:woodTex, bumpMap:woodTex, bumpScale:.4, glb:0xa97b50 },
+  brass:   { color:0xd0a53f, metalness:1,  roughness:.3,  env:1.2, glb:0xd0a53f },
+  polymer: { color:0x363a41, metalness:0,  roughness:.55, clearcoat:.5, ccr:.5, env:.8, glb:0x363a41 }
+};
+function makeMat(name){
+  const src = MATS[name] || MATS.steel;
+  return new THREE.MeshPhysicalMaterial({
+    color: src.color, metalness: src.metalness, roughness: src.roughness,
+    clearcoat: src.clearcoat || 0, clearcoatRoughness: src.ccr || 0,
+    map: src.map || null, bumpMap: src.bumpMap || null, bumpScale: src.bumpScale || 0,
+    envMapIntensity: src.env ?? 1.15
+  });
+}
+function refreshMat(matObj, name){
+  const m = MATS[name] || MATS.steel;
+  matObj.map = m.map || null;
+  matObj.bumpMap = m.bumpMap || null;
+  matObj.bumpScale = m.bumpScale || 0;
+  matObj.color.setHex(m.color);
+  matObj.metalness = m.metalness;
+  matObj.roughness = m.roughness;
+  matObj.clearcoat = m.clearcoat || 0;
+  matObj.clearcoatRoughness = m.ccr || 0;
+  matObj.envMapIntensity = m.env ?? 1.15;
+  matObj.needsUpdate = true;
+}
+
+/* ================= 3D-СЦЕНА ================= */
+let renderer = null, scene = null, camera = null, controls = null, floor = null, sun = null;
+const mainGrp   = new THREE.Group();
+const secondGrp = new THREE.Group();
+const dimGroup  = new THREE.Group();
+
+try{
+  const canvas = $('scene');
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.VSMShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+
+  scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+
+  camera = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, 1, 4000);
+  controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.dampingFactor = .08;
+
+  sun = new THREE.DirectionalLight(0xffffff, 2.4);
+  sun.position.set(55, 95, 45);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.bias = -0.0002;
+  sun.shadow.radius = 7; sun.shadow.blurSamples = 16;
+  scene.add(sun);
+  const rim = new THREE.DirectionalLight(0xffd9a0, .5);
+  rim.position.set(-80, 25, -70);
+  scene.add(rim);
+
+  floor = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), new THREE.ShadowMaterial({ opacity:.38 }));
+  floor.rotation.x = -Math.PI/2;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  scene.add(mainGrp, secondGrp, dimGroup);
+}catch(e){
+  showFatal('3D-сцена недоступна (' + (e?.message || e) + '). Экспорт моделей при этом работает.');
+}
+
+const matMain   = makeMat(P.mat);
+const matSecond = makeMat(Q.mat);
+
+/* ---------- чертёжный слой ---------- */
+function makeLabel(text, color = '#f0a43a'){
+  const px = 44, pad = 14, Rr = 2;
+  const cvs = document.createElement('canvas'), mm = cvs.getContext('2d');
+  const font = `500 ${px*Rr}px "JetBrains Mono", monospace`;
+  mm.font = font;
+  const w = Math.ceil(mm.measureText(text).width) + pad*2*Rr;
+  const h = (px + pad*2) * Rr;
+  cvs.width = w; cvs.height = h;
+  const c = cvs.getContext('2d');
+  c.font = font; c.fillStyle = color; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(text, w/2, h/2);
+  const tex = new THREE.CanvasTexture(cvs);
+  tex.anisotropy = 8; tex.colorSpace = THREE.SRGBColorSpace;
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map:tex, transparent:true, depthTest:false, depthWrite:false }));
+  spr.scale.set(w/Rr * 0.13, h/Rr * 0.13, 1);
+  spr.renderOrder = 998;
+  return spr;
+}
+const dimMat  = new THREE.LineBasicMaterial({ color:AMBER, transparent:true, opacity:.95, depthTest:false });
+const dashMat = new THREE.LineDashedMaterial({ color:AMBER, dashSize:2.2, gapSize:1.3, transparent:true, opacity:.9, depthTest:false });
+const axisMat = new THREE.LineDashedMaterial({ color:0x9aa0a8, dashSize:4.5, gapSize:1.8, transparent:true, opacity:.5, depthTest:false });
+
+function buildDims(){
+  const g = new THREE.Group();
+  const ra = D.ra, zf = P.b/2 + 0.6, zb = -(P.b/2 + 3.5), yd = -(ra + 12);
+  const L = ra + 7;
+  const axes = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-L,0,zf), new THREE.Vector3(L,0,zf),
+    new THREE.Vector3(0,-L,zf), new THREE.Vector3(0,L,zf)
+  ]), axisMat);
+  axes.computeLineDistances(); axes.renderOrder = 996;
+  g.add(axes);
+  const pc = new THREE.EllipseCurve(0,0,D.rd,D.rd,0,Math.PI*2).getPoints(180)
+    .map(p => new THREE.Vector3(p.x, p.y, zf));
+  const pcLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pc), dashMat);
+  pcLine.computeLineDistances(); pcLine.renderOrder = 996;
+  g.add(pcLine);
+  const segs = [
+    [-ra, yd,  ra, yd],
+    [-ra, -(ra+3), -ra, yd-2],
+    [ ra, -(ra+3),  ra, yd-2],
+    [-ra-1.6, yd-1.6, -ra+1.6, yd+1.6],
+    [ ra-1.6, yd-1.6,  ra+1.6, yd+1.6]
+  ];
+  const pos = [];
+  for (const s of segs) pos.push(s[0], s[1], zb, s[2], s[3], zb);
+  const dim = new THREE.LineSegments(new THREE.BufferGeometry()
+    .setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)), dimMat);
+  dim.renderOrder = 996;
+  g.add(dim);
+  const l1 = makeLabel(`Ø${P.da}`);
+  l1.position.set(0, yd + l1.scale.y/2 + 1, zb);
+  g.add(l1);
+  const aL = 0.72, z0 = P.b/2 + 2;
+  const p0 = new THREE.Vector3(ra*Math.cos(aL), ra*Math.sin(aL), z0);
+  const p1 = p0.clone().add(new THREE.Vector3(8, 8, 0));
+  const p2 = p1.clone().add(new THREE.Vector3(15, 0, 0));
+  const lead = new THREE.Line(new THREE.BufferGeometry().setFromPoints([p0,p1,p2]), dimMat);
+  lead.renderOrder = 996;
+  g.add(lead);
+  const l2 = makeLabel(`z = ${P.z}`);
+  l2.position.set(p2.x + l2.scale.x/2 + 1, p2.y, z0);
+  g.add(l2);
+  const aD = 2.55;
+  const l3 = makeLabel(`d = ${(D.rd*2).toFixed(1)}`);
+  l3.position.set((D.rd+7)*Math.cos(aD), (D.rd+7)*Math.sin(aD), zf);
+  g.add(l3);
+  if (Q.on && Dq){
+    const al = Q.angle*DEG, a2 = D.rd + Dq.rd + R.backlash;
+    const qpc = new THREE.EllipseCurve(0,0,Dq.rd,Dq.rd,0,Math.PI*2).getPoints(120)
+      .map(p => new THREE.Vector3(p.x + a2*Math.cos(al), p.y + a2*Math.sin(al), zf));
+    const qline = new THREE.Line(new THREE.BufferGeometry().setFromPoints(qpc), dashMat);
+    qline.computeLineDistances(); qline.renderOrder = 996;
+    g.add(qline);
+  }
+  g.visible = P.dims;
+  return g;
+}
+
+/* ---------- метки фазы ---------- */
+const markMatAmber = new THREE.MeshBasicMaterial({ color:0xf0a43a });
+const markMatGrey  = new THREE.MeshBasicMaterial({ color:0xd8dce2 });
+const markLineAmber = new THREE.LineBasicMaterial({ color:0xf0a43a, transparent:true, opacity:.95 });
+const markLineGrey  = new THREE.LineBasicMaterial({ color:0xd8dce2, transparent:true, opacity:.85 });
+function buildMark(Dv, Ev, amber){
+  const m = new THREE.Group();
+  const len = Dv.rd*0.92;
+  const line = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(len,0,0)]),
+    amber ? markLineAmber : markLineGrey);
+  const dot = new THREE.Mesh(new THREE.CircleGeometry(Math.max(0.9, Dv.m*0.55), 24),
+    amber ? markMatAmber : markMatGrey);
+  dot.position.set(len, 0, 0.02);
+  m.add(line, dot);
+  m.position.z = Ev.H/2 + 0.35;
+  return m;
+}
+let mark1 = null, mark2 = null;
+
+/* ================= КИНЕМАТИКА ================= */
+function mainAngle(){ return R.jog*DEG + ph1; }
+function secondAngle(){
+  const al = Q.angle*DEG;
+  return (1 + P.z/Q.z)*al + Math.PI - Math.PI/Q.z - (P.z/Q.z)*mainAngle();
+}
+function secondPos(){
+  const al = Q.angle*DEG;
+  const a = D.rd + Dq.rd + R.backlash;
+  return { x: a*Math.cos(al), y: a*Math.sin(al) };
+}
+function applyTransforms(){
+  mainGrp.rotation.z = mainAngle();
+  if (Q.on && Dq){
+    const p = secondPos();
+    secondGrp.position.set(p.x, p.y, 0);
+    secondGrp.rotation.z = secondAngle();
+    secondGrp.visible = true;
+  } else {
+    secondGrp.visible = false;
+  }
+}
+
+/* ================= ПЕРЕСБОРКА ================= */
+function clearGroup(g){
+  const old = [...g.children];
+  g.clear();
+  old.forEach(o => o.traverse?.(x => { x.geometry && x.geometry.dispose(); }));
+}
+let rafPend = false;
+function scheduleRebuild(){
+  if (rafPend) return;
+  rafPend = true;
+  requestAnimationFrame(() => { rafPend = false; rebuild(); });
+}
+function rebuild(){
+  try{
+    D = deriveMain();
+    if (!Number.isFinite(D.m) || !Number.isFinite(D.rf)) throw new Error('параметры вне допустимого диапазона');
+    E = resolveGear(P, D);
+    if (Q.on){ Dq = deriveSecond(); Eq = resolveGear(Q, Dq); }
+
+    clearGroup(mainGrp);
+    const parts1 = buildGearMeshes(D, E, P, matMain);
+    parts1.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    mainGrp.add(parts1);
+    mark1 = buildMark(D, E, true);
+    mark1.visible = P.marks;
+    mainGrp.add(mark1);
+
+    clearGroup(secondGrp);
+    mark2 = null;
+    if (Q.on){
+      const parts2 = buildGearMeshes(Dq, Eq, Q, matSecond);
+      parts2.traverse(o => { if (o.isMesh) o.castShadow = true; });
+      secondGrp.add(parts2);
+      mark2 = buildMark(Dq, Eq, false);
+      mark2.visible = P.marks;
+      secondGrp.add(mark2);
+    }
+
+    clearGroup(dimGroup);
+    dimGroup.add(buildDims());
+
+    applyTransforms();
+
+    let tris = 0;
+    mainGrp.traverse(o => { if (o.isMesh) tris += o.geometry.attributes.position.count/3; });
+    if (Q.on) secondGrp.traverse(o => { if (o.isMesh) tris += o.geometry.attributes.position.count/3; });
+    $('expTris').textContent = tris.toLocaleString('ru-RU');
+
+    if (floor){
+      const b = bounds();
+      floor.position.y = b.miny - 16;
+      const s = b.rad + 14;
+      Object.assign(sun.shadow.camera, { left:-s, right:s, top:s, bottom:-s, near:10, far:500 });
+      sun.shadow.camera.updateProjectionMatrix();
+    }
+    updateSpec();
+    syncUI();
+    $('bigD').textContent = P.da;
+    $('bigZ').textContent = P.z;
+    $('headA').textContent = P.alpha;
+    /* только добавочный спан — статичный #headA не разрушается */
+    $('headPair').innerHTML = Q.on ? ` · <span style="color:#f0a43a">пара z${Q.z}</span>` : '';
+
+    const key = P.z + '|' + P.da + '|' + Q.on + '|' + Q.z;
+    if (key !== lastKey){
+      lastKey = key;
+      fitView();
+    }
+  }catch(err){
+    showFatal(err?.message || err);
+  }
+}
+function bounds(){
+  let minx = -D.ra, maxx = D.ra, miny = -D.ra, maxy = D.ra, maxR = D.ra;
+  if (Q.on && Dq){
+    const p = secondPos();
+    minx = Math.min(minx, p.x - Dq.ra); maxx = Math.max(maxx, p.x + Dq.ra);
+    miny = Math.min(miny, p.y - Dq.ra); maxy = Math.max(maxy, p.y + Dq.ra);
+    maxR = Math.max(maxR, Math.hypot(p.x, p.y) + Dq.ra);
+  }
+  const cx = (minx+maxx)/2, cy = (miny+maxy)/2;
+  const rad = Math.max(maxx-minx, maxy-miny)/2 + maxR*0.3;
+  return { cx, cy, rad, miny, maxR };
+}
+function fitView(){
+  if (!renderer || !D) return;
+  const b = bounds();
+  controls.target.set(b.cx, b.cy, 0);
+  controls.minDistance = 12; controls.maxDistance = b.rad*22 + 300;
+  const d = b.rad*2.9 + 24;
+  const dir = new THREE.Vector3(0.35, 0.28, 1).normalize();
+  camera.position.set(b.cx + dir.x*d, b.cy + dir.y*d, dir.z*d);
+}
+
+/* ================= СПЕЦИФИКАЦИЯ И UI ================= */
+const r1 = v => Math.round(v * 10) / 10;
+function updateSpec(){
+  $('spM').textContent  = D.m.toFixed(4) + ' мм';
+  $('spD').textContent  = (D.rd*2).toFixed(3) + ' мм';
+  $('spDa').textContent = (D.ra*2).toFixed(3) + ' мм';
+  $('spF').textContent  = (D.rf*2).toFixed(3) + ' мм';
+  $('spB').textContent  = (D.rb*2).toFixed(3) + ' мм';
+  $('spP').textContent  = (Math.PI*D.m).toFixed(3) + ' мм';
+  $('spX').textContent  = (P.x > 0 ? '+' : P.x < 0 ? '−' : '') + Math.abs(P.x).toFixed(2);
+  $('spBo').textContent = E.tanB > 1e-6
+    ? `${E.dLo.toFixed(2)} / ${E.dHi.toFixed(2)} мм`
+    : E.bore.toFixed(2) + ' мм';
+  if (Q.on && Dq){
+    $('spQ2').textContent = `${Q.z} / ${(Dq.ra*2).toFixed(1)} мм`;
+    $('spI').textContent  = `1 : ${(Q.z/P.z).toFixed(3)} · реверс`;
+    $('spA').textContent  = (D.rd + Dq.rd + R.backlash).toFixed(2) + ' мм';
+  } else {
+    $('spQ2').textContent = '—';
+    $('spI').textContent  = '—';
+    $('spA').textContent  = '—';
+  }
+  $('spH').textContent  = E.hubH.toFixed(1) + ' мм';
+}
+function syncUI(){
+  const ae = document.activeElement;
+  const set = (id, v) => { const el = $(id); if (el && el !== ae) el.value = v; };
+
+  const bMax = Math.max(1, r1(Math.min(60, Math.max(1.6, 2*(D.rf - 1)))));
+  $('inBore').max = bMax; $('numBore').max = bMax;
+  P.bore = clamp(P.bore, 1, bMax);
+  set('inBore', P.bore); set('numBore', P.bore);
+
+  const hubMin = Math.max(6, Math.ceil((E.bore + 3.2) * 2) / 2);
+  const hubMax = Math.max(hubMin, r1(Math.min(200, E.hubR*2 + 40)));
+  $('inHub').min = hubMin; $('inHub').max = hubMax;
+  $('numHub').min = hubMin; $('numHub').max = hubMax;
+  P.hubD = clamp(P.hubD, hubMin, hubMax);
+  set('inHub', P.hubD); set('numHub', P.hubD);
+
+  if (E.nH > 0){
+    const oMax = Math.max(1, r1(E.holeR * 2));
+    $('inHole').max = oMax; $('numHole').max = oMax;
+    P.holeD = Math.min(P.holeD, oMax);
+    set('inHole', P.holeD); set('numHole', P.holeD);
+  }
+  const tMax = Math.min(15, Math.floor(Math.atan(Math.max(0, E.bore/2 - 0.4)/Math.max(E.H/2, 0.5)) * 180/Math.PI * 4) / 4);
+  $('inTaper').max = tMax; $('numTaper').max = tMax;
+  if (P.taper > tMax) P.taper = tMax;
+  set('inTaper', P.taper); set('numTaper', P.taper);
+
+  const note = $('keyNote');
+  if (E.bore < 6){ note.textContent = 'паз доступен от отверстия Ø6 мм'; note.classList.add('show'); }
+  else if (E.tanB > 1e-6){ note.textContent = 'при конусности паз отключается'; note.classList.add('show'); }
+  else note.classList.remove('show');
+  const dis = E.bore < 6 || E.tanB > 1e-6;
+  if (E.tanB > 1e-6){ P.key = false; $('cbKey').checked = false; }
+  $('cbKey').disabled = dis;
+  $('wrapKey').classList.toggle('disabled', dis);
+
+  if (Q.on && Dq && Eq){
+    const qBMax = Math.max(1, r1(Math.min(40, Math.max(1.6, 2*(Dq.rf - 1)))));
+    $('qBs').max = qBMax; $('qBn').max = qBMax;
+    Q.bore = clamp(Q.bore, 1, qBMax);
+    set('qBs', Q.bore); set('qBn', Q.bore);
+
+    const qHubMin = Math.max(6, Math.ceil((Q.bore + 3.2) * 2) / 2);
+    const qHubMax = Math.max(qHubMin, r1(Math.min(80, Eq.hubR*2 + 40)));
+    $('qHs').min = qHubMin; $('qHs').max = qHubMax;
+    $('qHn').min = qHubMin; $('qHn').max = qHubMax;
+    Q.hubD = clamp(Q.hubD, qHubMin, qHubMax);
+    set('qHs', Q.hubD); set('qHn', Q.hubD);
+  }
+  segSet('presetsShaft', String(P.bore));
+  segSet('presetsShaftQ', String(Q.bore));
+}
+function segSet(id, v){
+  [...$(id).children].forEach(b => b.classList.toggle('on', b.dataset.v === v));
+}
+
+/* ---------- привязка: слайдер + число ---------- */
+function bindPair(sid, nid, obj, key, cfg){
+  const sl = $(sid), nm = $(nid);
+  const apply = v => {
+    obj[key] = clamp(v, cfg.min, cfg.max);
+    sl.value = obj[key];
+    scheduleRebuild();
+  };
+  sl.addEventListener('input', () => {
+    obj[key] = parseFloat(sl.value);
+    if (document.activeElement !== nm) nm.value = sl.value;
+    scheduleRebuild();
+  });
+  nm.addEventListener('input', () => {
+    const v = parseFloat(nm.value);
+    if (Number.isFinite(v) && v >= cfg.min && v <= cfg.max) apply(v);
+  });
+  nm.addEventListener('change', () => {
+    const v = parseFloat(nm.value);
+    if (Number.isFinite(v)) apply(v);
+    else { nm.value = obj[key]; sl.value = obj[key]; }
+  });
+  nm.addEventListener('keydown', e => { if (e.key === 'Enter') nm.blur(); });
+}
+bindPair('inZ','numZ', P, 'z',     { min:6,   max:120, step:1 });
+bindPair('inDa','numDa', P, 'da',  { min:10,  max:200, step:0.1 });
+bindPair('inB','numB', P, 'b',     { min:2,   max:40,  step:0.1 });
+bindPair('inX','numX', P, 'x',     { min:-0.5,max:1,   step:0.01 });
+bindPair('inBk','numBk', R, 'backlash', { min:0, max:0.5, step:0.05 });
+bindPair('inBore','numBore', P, 'bore',  { min:1, max:60, step:0.1 });
+bindPair('inTaper','numTaper', P, 'taper', { min:0, max:15, step:0.25 });
+bindPair('inHub','numHub', P, 'hubD',    { min:6, max:200, step:0.5 });
+bindPair('inRise','numRise', P, 'rise',  { min:0, max:30, step:0.5 });
+bindPair('inHole','numHole', P, 'holeD', { min:1, max:40, step:0.1 });
+bindPair('qZs','qZn', Q, 'z',    { min:6, max:120, step:1 });
+bindPair('qBs','qBn', Q, 'bore', { min:1, max:40,  step:0.1 });
+bindPair('qWs','qWn', Q, 'b',    { min:2, max:30,  step:0.5 });
+bindPair('qHs','qHn', Q, 'hubD', { min:6, max:80,  step:0.5 });
+bindPair('qRs','qRn', Q, 'rise', { min:0, max:20,  step:0.5 });
+bindPair('inRpm','numRpm', P, 'rpm', { min:0, max:60, step:1 });
+
+ $('qAng').addEventListener('input', e => {
+  Q.angle = parseFloat(e.target.value);
+  $('outAng').textContent = Math.round(Q.angle) + '°';
+  applyTransforms();
+  if (floor){ const b = bounds(); floor.position.y = b.miny - 16; }
+  scheduleRebuild();
+});
+
+function segBind(id, obj, key, cast, after){
+  $(id).addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    segSet(id, b.dataset.v);
+    obj[key] = cast(b.dataset.v);
+    (after || scheduleRebuild)();
+  });
+}
+segBind('segA', P, 'alpha', parseFloat);
+segBind('segTd', P, 'tDir', v => v);
+segBind('segH', P, 'holes', v => parseInt(v, 10));
+segBind('segM', P, 'mat', v => v, () => { refreshMat(matMain, P.mat); });
+segBind('segMatQ', Q, 'mat', v => v, () => { refreshMat(matSecond, Q.mat); });
+
+ $('presetsShaft').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  P.bore = parseFloat(b.dataset.v);
+  segSet('presetsShaft', b.dataset.v);
+  $('inBore').value = P.bore; $('numBore').value = P.bore;
+  scheduleRebuild();
+});
+ $('presetsShaftQ').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  Q.bore = parseFloat(b.dataset.v);
+  segSet('presetsShaftQ', b.dataset.v);
+  $('qBs').value = Q.bore; $('qBn').value = Q.bore;
+  scheduleRebuild();
+});
+
+ $('cbPair').addEventListener('change', e => {
+  Q.on = e.target.checked;
+  $('pairBody').classList.toggle('off', !Q.on);
+  if (!Q.on && R.what !== 'main'){ R.what = 'main'; segSet('segWhat', 'main'); }
+  scheduleRebuild();
+});
+ $('cbSpin').addEventListener('change', e => P.spin = e.target.checked);
+ $('cbPause').addEventListener('change', e => R.paused = e.target.checked);
+ $('cbKey').addEventListener('change', e => { P.key = e.target.checked; scheduleRebuild(); });
+ $('cbDims').addEventListener('change', e => { P.dims = e.target.checked; dimGroup.visible = P.dims; });
+ $('cbMarks').addEventListener('change', e => {
+  P.marks = e.target.checked;
+  if (mark1) mark1.visible = P.marks;
+  if (mark2) mark2.visible = P.marks;
+});
+ $('inJog').addEventListener('input', e => {
+  R.jog = parseFloat(e.target.value);
+  $('outJog').textContent = Math.round(R.jog) + '°';
+  applyTransforms();
+});
+
+/* ================= ЭКСПОРТ: 3D-форматы ================= */
+function collectSolid(which){
+  const list = [];
+  if (which === 'second' && Q.on){
+    const p = secondPos();
+    list.push({ Dv:Dq, Ev:Eq, cfg:Q, mat:matSecond, rot:secondAngle(), px:p.x, py:p.y });
+  } else if (which === 'both' && Q.on){
+    list.push({ Dv:D, Ev:E, cfg:P, mat:matMain, rot:mainAngle(), px:0, py:0 });
+    const p = secondPos();
+    list.push({ Dv:Dq, Ev:Eq, cfg:Q, mat:matSecond, rot:secondAngle(), px:p.x, py:p.y });
+  } else {
+    list.push({ Dv:D, Ev:E, cfg:P, mat:matMain, rot:mainAngle(), px:0, py:0 });
+  }
+  const arrs = [];
+  const Rm = new THREE.Matrix4(), T = new THREE.Matrix4(), M = new THREE.Matrix4();
+  const v = new THREE.Vector3();
+  for (const it of list){
+    const parts = buildGearMeshes(it.Dv, it.Ev, it.cfg, it.mat);
+    parts.updateMatrixWorld(true);
+    Rm.makeRotationZ(it.rot);
+    T.makeTranslation(it.px, it.py, it.Ev.lift);
+    M.multiplyMatrices(T, Rm);
+    parts.traverse(o => {
+      if (!o.isMesh) return;
+      const p = o.geometry.attributes.position;
+      const a = new Float32Array(p.count*3);
+      for (let i = 0; i < p.count; i++){
+        v.set(p.getX(i), p.getY(i), p.getZ(i)).applyMatrix4(M);
+        a[3*i] = v.x; a[3*i+1] = v.y; a[3*i+2] = v.z;
+      }
+      arrs.push(a);
+      o.geometry.dispose();
+    });
+  }
+  const pos = new Float32Array(arrs.reduce((s,a) => s + a.length, 0));
+  let off = 0;
+  for (const a of arrs){ pos.set(a, off); off += a.length; }
+  return pos;
+}
+function dedupe(pos){
+  const map = new Map(), verts = [], idx = new Uint32Array(pos.length/3);
+  for (let i = 0, j = 0; i < pos.length; i += 3, j++){
+    const k = Math.round(pos[i]*1e4) + ',' + Math.round(pos[i+1]*1e4) + ',' + Math.round(pos[i+2]*1e4);
+    let id = map.get(k);
+    if (id === undefined){ id = verts.length/3; map.set(k, id); verts.push(pos[i], pos[i+1], pos[i+2]); }
+    idx[j] = id;
+  }
+  return { verts: new Float32Array(verts), idx };
+}
+function triNormal(pos, a){
+  const ux = pos[a+3]-pos[a],   uy = pos[a+4]-pos[a+1], uz = pos[a+5]-pos[a+2];
+  const vx = pos[a+6]-pos[a],   vy = pos[a+7]-pos[a+1], vz = pos[a+8]-pos[a+2];
+  let nx = uy*vz - uz*vy, ny = uz*vx - ux*vz, nz = ux*vy - uy*vx;
+  const l = Math.hypot(nx, ny, nz) || 1;
+  return [nx/l, ny/l, nz/l];
+}
+function stlBinary(pos){
+  const n = pos.length/9;
+  const buf = new ArrayBuffer(84 + n*50);
+  const dv = new DataView(buf);
+  const hdr = 'parametric involute gear, mm';
+  for (let i = 0; i < hdr.length; i++) dv.setUint8(i, hdr.charCodeAt(i));
+  dv.setUint32(80, n, true);
+  let o = 84;
+  for (let t = 0; t < n; t++){
+    const a = t*9, [nx, ny, nz] = triNormal(pos, a);
+    dv.setFloat32(o, nx, true); dv.setFloat32(o+4, ny, true); dv.setFloat32(o+8, nz, true);
+    for (let k = 0; k < 9; k++) dv.setFloat32(o+12+k*4, pos[a+k], true);
+    dv.setUint16(o+48, 0, true);
+    o += 50;
+  }
+  return buf;
+}
+function stlAscii(pos){
+  const n = pos.length/9, out = ['solid gear'];
+  for (let t = 0; t < n; t++){
+    const a = t*9, [nx, ny, nz] = triNormal(pos, a);
+    out.push(`facet normal ${nx} ${ny} ${nz}`, ' outer loop');
+    for (let k = 0; k < 3; k++)
+      out.push(`  vertex ${pos[a+k*3]} ${pos[a+k*3+1]} ${pos[a+k*3+2]}`);
+    out.push(' endloop', 'endfacet');
+  }
+  out.push('endsolid gear');
+  return out.join('\n');
+}
+function toOBJ(pos){
+  const { verts, idx } = dedupe(pos);
+  const L = ['# parametric involute gear, units: mm', 'o gear'];
+  for (let i = 0; i < verts.length; i += 3)
+    L.push(`v ${verts[i]} ${verts[i+1]} ${verts[i+2]}`);
+  for (let i = 0; i < idx.length; i += 3)
+    L.push(`f ${idx[i]+1} ${idx[i+1]+1} ${idx[i+2]+1}`);
+  return L.join('\n');
+}
+function toPLY(pos){
+  const { verts, idx } = dedupe(pos);
+  const nv = verts.length/3, nf = idx.length/3;
+  const header = `ply\nformat binary_little_endian 1.0\ncomment parametric gear (mm)\nelement vertex ${nv}\nproperty float x\nproperty float y\nproperty float z\nelement face ${nf}\nproperty list uchar uint32 vertex_indices\nend_header\n`;
+  const hb = new TextEncoder().encode(header);
+  const body = new ArrayBuffer(nv*12 + nf*13);
+  const dv = new DataView(body);
+  let o = 0;
+  for (let i = 0; i < verts.length; i++, o += 4) dv.setFloat32(o, verts[i], true);
+  for (let i = 0; i < idx.length; i += 3){
+    dv.setUint8(o, 3); o += 1;
+    dv.setUint32(o, idx[i], true); dv.setUint32(o+4, idx[i+1], true); dv.setUint32(o+8, idx[i+2], true); o += 12;
+  }
+  const out = new Uint8Array(hb.length + body.byteLength);
+  out.set(hb, 0); out.set(new Uint8Array(body), hb.length);
+  return out.buffer;
+}
+const CRC_T = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++){
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c;
+  }
+  return t;
+})();
+function crc32(u8){
+  let c = ~0;
+  for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 255] ^ (c >>> 8);
+  return ~c >>> 0;
+}
+function makeZip(entries){
+  const enc = new TextEncoder(), chunks = [], central = [];
+  let offset = 0;
+  const dTime = 12 << 11, dDate = ((2024-1980) << 9) | (1 << 5) | 1;
+  for (const e of entries){
+    const name = enc.encode(e.name), crc = crc32(e.u8), sz = e.u8.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true);
+    lh.setUint16(10, dTime, true); lh.setUint16(12, dDate, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, sz, true); lh.setUint32(22, sz, true);
+    lh.setUint16(26, name.length, true);
+    chunks.push(new Uint8Array(lh.buffer), name, e.u8);
+    central.push({ name, crc, sz, off: offset });
+    offset += 30 + name.length + sz;
+  }
+  const cdStart = offset;
+  let cdSize = 0;
+  for (const c of central){
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+    ch.setUint16(12, dTime, true); ch.setUint16(14, dDate, true);
+    ch.setUint32(16, c.crc, true); ch.setUint32(20, c.sz, true); ch.setUint32(24, c.sz, true);
+    ch.setUint16(28, c.name.length, true);
+    ch.setUint32(42, c.off, true);
+    chunks.push(new Uint8Array(ch.buffer), c.name);
+    cdSize += 46 + c.name.length;
+  }
+  const eo = new DataView(new ArrayBuffer(22));
+  eo.setUint32(0, 0x06054b50, true);
+  eo.setUint16(8, central.length, true); eo.setUint16(10, central.length, true);
+  eo.setUint32(12, cdSize, true); eo.setUint32(16, cdStart, true);
+  chunks.push(new Uint8Array(eo.buffer));
+  return new Blob(chunks, { type:'model/3mf' });
+}
+function to3MF(pos){
+  const { verts, idx } = dedupe(pos);
+  const f = v => Number(v.toFixed(3));
+  const V = [], T = [];
+  for (let i = 0; i < verts.length; i += 3)
+    V.push(`<vertex x="${f(verts[i])}" y="${f(verts[i+1])}" z="${f(verts[i+2])}"/>`);
+  for (let i = 0; i < idx.length; i += 3)
+    T.push(`<triangle v1="${idx[i]}" v2="${idx[i+1]}" v3="${idx[i+2]}"/>`);
+  const model = `<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="ru" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><metadata name="Title">Parametric involute gear</metadata><resources><object id="1" type="model"><mesh><vertices>${V.join('')}</vertices><triangles>${T.join('')}</triangles></mesh></object></resources><build><item objectid="1"/></build></model>`;
+  const ct = `<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>`;
+  const rels = `<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel-1" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>`;
+  const enc = new TextEncoder();
+  return makeZip([
+    { name:'[Content_Types].xml', u8: enc.encode(ct) },
+    { name:'_rels/.rels',         u8: enc.encode(rels) },
+    { name:'3D/3dmodel.model',    u8: enc.encode(model) }
+  ]);
+}
+function toGLB(pos, matName){
+  const { verts, idx } = dedupe(pos);
+  const nv = verts.length/3;
+  const p = new Float32Array(nv*3);
+  const min = [1e9,1e9,1e9], max = [-1e9,-1e9,-1e9];
+  for (let i = 0; i < nv; i++){
+    p[3*i] = verts[3*i]; p[3*i+1] = verts[3*i+2]; p[3*i+2] = -verts[3*i+1];
+    for (let k = 0; k < 3; k++){
+      const v = p[3*i+k];
+      if (v < min[k]) min[k] = v;
+      if (v > max[k]) max[k] = v;
+    }
+  }
+  const bin = new Uint8Array(idx.byteLength + p.byteLength);
+  bin.set(new Uint8Array(idx.buffer, idx.byteOffset, idx.byteLength), 0);
+  bin.set(new Uint8Array(p.buffer), idx.byteLength);
+  const m = MATS[matName] || MATS.steel;
+  const c = new THREE.Color(m.glb);
+  const gltf = {
+    asset:{ version:'2.0', generator:'parametric-gear' },
+    scene:0, scenes:[{ nodes:[0] }],
+    nodes:[{ mesh:0, name:'gear' }],
+    meshes:[{ name:'gear', primitives:[{ attributes:{ POSITION:0 }, indices:1, mode:4, material:0 }] }],
+    materials:[{ name: matName, doubleSided:false,
+      pbrMetallicRoughness:{ baseColorFactor:[c.r, c.g, c.b, 1],
+        metallicFactor: m.metalness, roughnessFactor: m.roughness } }],
+    buffers:[{ byteLength: bin.length }],
+    bufferViews:[
+      { buffer:0, byteOffset:0, byteLength:p.byteLength, target:34962 },
+      { buffer:0, byteOffset:p.byteLength, byteLength:idx.byteLength, target:34963 }
+    ],
+    accessors:[
+      { bufferView:0, componentType:5126, count:nv, type:'VEC3', min, max },
+      { bufferView:1, componentType:5125, count:idx.length, type:'SCALAR' }
+    ]
+  };
+  let j = new TextEncoder().encode(JSON.stringify(gltf));
+  const pj = (4 - j.length % 4) % 4;
+  if (pj){ const t = new Uint8Array(j.length + pj); t.set(j); t.fill(0x20, j.length); j = t; }
+  const pb = (4 - bin.length % 4) % 4;
+  let binP = bin;
+  if (pb){ const t = new Uint8Array(bin.length + pb); t.set(bin); binP = t; }
+  const total = 12 + 8 + j.length + 8 + binP.length;
+  const hd = new DataView(new ArrayBuffer(12));
+  hd.setUint32(0, 0x46546C67, true); hd.setUint32(4, 2, true); hd.setUint32(8, total, true);
+  const c0 = new DataView(new ArrayBuffer(8));
+  c0.setUint32(0, j.length, true); c0.setUint32(4, 0x4E4F534A, true);
+  const c1 = new DataView(new ArrayBuffer(8));
+  c1.setUint32(0, binP.length, true); c1.setUint32(4, 0x004E4942, true);
+  return new Blob([hd.buffer, c0.buffer, j, c1.buffer, binP], { type:'model/gltf-binary' });
+}
+
+/* ================= ЭКСПОРТ: DXF — плоский чертёж (R12, ASCII) ================= */
+function dxfNum(v){
+  return (Math.round(v * 1000) / 1000).toFixed(3);
+}
+function buildDXF(which){
+  const out = [];
+  const w = (...a) => { for (const x of a) out.push(String(x)); };
+  const N = dxfNum;
+
+  /* ---- таблицы: типы линий и слои ---- */
+  w('0','SECTION','2','TABLES');
+  w('0','TABLE','2','LTYPE','70','2');
+  w('0','LTYPE','2','CONTINUOUS','70','0','3','Solid line','72','65','73','0','40','0.0');
+  w('0','LTYPE','2','DASHED','70','0','3','Dashed','72','65','73','2','40','9.0','49','6.0','49','3.0');
+  w('0','ENDTAB');
+  w('0','TABLE','2','LAYER','70','4');
+  const layer = (name,color,ltype) => w('0','LAYER','2',name,'70','0','62',String(color),'6',ltype);
+  layer('OUTLINE',7,'CONTINUOUS');
+  layer('CENTER', 1,'DASHED');
+  layer('HOLES',  7,'CONTINUOUS');
+  layer('TEXT',   2,'CONTINUOUS');
+  w('0','ENDTAB','0','ENDSEC');
+  w('0','SECTION','2','ENTITIES');
+
+  const line   = (x1,y1,x2,y2,l) => w('0','LINE','8',l,'10',N(x1),'20',N(y1),'30','0.0','11',N(x2),'21',N(y2),'31','0.0');
+  const circle = (cx,cy,r,l)     => w('0','CIRCLE','8',l,'10',N(cx),'20',N(cy),'30','0.0','40',N(r));
+  const text   = (x,y,h,s,l)     => w('0','TEXT','8',l,'10',N(x),'20',N(y),'30','0.0','40',N(h),'1',s);
+  const poly   = (pts,l) => {
+    w('0','POLYLINE','8',l,'66','1','70','1');
+    for (const p of pts) w('0','VERTEX','8',l,'10',N(p.x),'20',N(p.y),'30','0.0');
+    w('0','SEQEND','8',l);
+  };
+
+  /* ---- какие колёса чертим ---- */
+  const items = [];
+  if (which === 'second' && Q.on && Dq){
+    items.push({ Dv:Dq, Ev:Eq, cfg:Q, cx:0, cy:0, rot:0 });
+  } else if (which === 'both' && Q.on && Dq){
+    items.push({ Dv:D, Ev:E, cfg:P, cx:0, cy:0, rot:mainAngle() });
+    const p = secondPos();
+    items.push({ Dv:Dq, Ev:Eq, cfg:Q, cx:p.x, cy:p.y, rot:secondAngle() });
+  } else {
+    items.push({ Dv:D, Ev:E, cfg:P, cx:0, cy:0, rot:0 });
+  }
+
+  /* ---- фронтальный вид каждого колеса ---- */
+  for (const it of items){
+    const { Dv, Ev, cfg, cx, cy } = it;
+    const c = Math.cos(it.rot), s = Math.sin(it.rot);
+    const tf = (x,y) => ({ x: cx + x*c - y*s, y: cy + x*s + y*c });
+
+    /* эвольвентный контур (номинальный, без печатных фасок) */
+    poly(gearOutline(Dv.ra, Dv.rf, Dv.rb, cfg.z, Dv.alpha, Dv.psi).map(p => tf(p.x, p.y)), 'OUTLINE');
+
+    /* отверстие */
+    if (Ev.wk){
+      poly(boreHole(Ev.bore/2, Ev.keyW, Ev.keyTop).getPoints(1).map(p => tf(p.x, p.y)), 'HOLES');
+    } else {
+      circle(cx, cy, Ev.bore/2, 'HOLES');
+    }
+    /* отверстия в диске */
+    for (let i = 0; i < Ev.nH; i++){
+      const a = i/Ev.nH * 2*Math.PI;
+      const hp = tf(Ev.ringR*Math.cos(a), Ev.ringR*Math.sin(a));
+      circle(hp.x, hp.y, Ev.holeR, 'HOLES');
+    }
+    /* делительная окружность и центровые оси — штрихпунктир */
+    circle(cx, cy, Dv.rd, 'CENTER');
+    const cl = Dv.ra + 4;
+    line(cx-cl, cy, cx+cl, cy, 'CENTER');
+    line(cx, cy-cl, cx, cy+cl, 'CENTER');
+    /* автоподписи */
+    text(cx + Dv.ra + 5, cy + Dv.ra, 3,
+      `z=${cfg.z}  m=${Dv.m.toFixed(3)}  a=${Dv.alpha*180/Math.PI}deg`, 'TEXT');
+    text(cx + Dv.ra + 5, cy + Dv.ra - 4.5, 3,
+      `da=${(Dv.ra*2).toFixed(1)}  df=${(Dv.rf*2).toFixed(1)}  d=${(Dv.rd*2).toFixed(2)}`, 'TEXT');
+    text(cx + Dv.ra + 5, cy + Dv.ra - 9, 3,
+      `b=${cfg.b}  bore=${Ev.bore.toFixed(1)}${Ev.wk ? ' +key' : ''}`, 'TEXT');
+  }
+
+  /* ---- боковой вид (для одиночного колеса) ---- */
+  if (items.length === 1){
+    const it = items[0], Dv = it.Dv, Ev = it.Ev, cfg = it.cfg;
+    const cy = -(Dv.ra + 10 + Ev.hubH);
+    const rect = (x0,x1,y0,y1,l) => poly([{x:x0,y:y0},{x:x1,y:y0},{x:x1,y:y1},{x:x0,y:y1}], l);
+    rect(-cfg.b/2, cfg.b/2, cy - Dv.ra, cy + Dv.ra, 'OUTLINE');
+    if (Ev.hubH > cfg.b + 0.01) rect(-Ev.hubH/2, Ev.hubH/2, cy - Ev.hubR, cy + Ev.hubR, 'OUTLINE');
+    /* отверстие — выносными линиями */
+    line(-Ev.hubH/2 - 2, cy + Ev.bore/2, cfg.b/2 + 2, cy + Ev.bore/2, 'HOLES');
+    line(-Ev.hubH/2 - 2, cy - Ev.bore/2, cfg.b/2 + 2, cy - Ev.bore/2, 'HOLES');
+    /* ось */
+    line(-Ev.hubH/2 - 6, cy, Ev.hubH/2 + 6, cy, 'CENTER');
+    text(0, cy - Dv.ra - 6, 3, 'SIDE VIEW', 'TEXT');
+  }
+
+  w('0','ENDSEC','0','EOF');
+  return out.join('\r\n');
+}
+
+/* ================= РЕЕСТР ФОРМАТОВ ================= */
+const FMTS = {
+  stlb: { ext:'stl', label:'STL (бинарный)', make: p => stlBinary(p) },
+  stla: { ext:'stl', label:'STL (ASCII)',    make: p => stlAscii(p) },
+  mf3:  { ext:'3mf', label:'3MF',            make: p => to3MF(p) },
+  obj:  { ext:'obj', label:'OBJ',            make: p => toOBJ(p) },
+  ply:  { ext:'ply', label:'PLY',            make: p => toPLY(p) },
+  glb:  { ext:'glb', label:'GLB',            make: p => toGLB(p, R.what === 'second' ? Q.mat : P.mat) },
+  dxf:  { ext:'dxf', label:'DXF (чертёж)',   make: null }   /* собирается отдельно: buildDXF() */
+};
+const FMT_DESC = {
+  stlb:'бинарный STL — основной формат для слайсеров: Cura, PrusaSlicer, Bambu Studio',
+  stla:'ASCII STL — текстовый вариант того же, для обмена и отладки',
+  mf3:'3MF — современный формат 3D-печати: ZIP-контейнер, жёстко заданы миллиметры',
+  obj:'OBJ — универсальный обмен с CAD-системами и рендерами',
+  ply:'PLY (бинарный) — компактная триангуляция со сваренными вершинами',
+  glb:'GLB (glTF 2.0) — просмотр и обмен, базовый цвет материала сохраняется',
+  dxf:'DXF R12 — плоский чертёж для CAD: фронтальный и боковой виды, слои, штрихпунктирные оси, автоподписи'
+};
+ $('expDesc').textContent = FMT_DESC[P.fmt];
+ $('segFmt').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  segSet('segFmt', b.dataset.v);
+  P.fmt = b.dataset.v;
+  $('expDesc').textContent = FMT_DESC[P.fmt];
+  const info = $('expInfo'); info.className = ''; info.textContent = '';
+});
+ $('segWhat').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  segSet('segWhat', b.dataset.v);
+  R.what = b.dataset.v;
+});
+
+function fmtSize(b){
+  return b >= 1048576 ? (b/1048576).toFixed(2) + ' МБ'
+       : b >= 1024    ? (b/1024).toFixed(1) + ' КБ'
+       : b + ' Б';
+}
+function buildFileName(){
+  const mm = s => String(s).replace('.', 'p');
+  if (P.fmt === 'dxf'){
+    if (R.what === 'second' && Q.on) return `gear_drawing_z${Q.z}_m${mm(D.m)}.dxf`;
+    if (R.what === 'both'   && Q.on) return `gearpair_drawing_z${P.z}z${Q.z}_m${mm(D.m)}.dxf`;
+    return `gear_drawing_z${P.z}_d${mm(P.da)}.dxf`;
+  }
+  if (R.what === 'second' && Q.on)
+    return `gear_z${Q.z}_m${mm(D.m)}_bore${mm(Q.bore)}.${FMTS[P.fmt].ext}`;
+  if (R.what === 'both' && Q.on)
+    return `gearpair_z${P.z}z${Q.z}_m${mm(D.m)}.${FMTS[P.fmt].ext}`;
+  return `gear_z${P.z}_d${mm(P.da)}_bore${mm(P.bore)}` +
+    (P.x ? `_x${mm(P.x)}` : '') +
+    (P.taper ? `_c${mm(P.taper)}` : '') +
+    `.${FMTS[P.fmt].ext}`;
+}
+let lastUrl = null;
+function showDownloadResult(name, url, size){
+  const info = $('expInfo');
+  info.className = 'ok';
+  info.innerHTML = '';
+  const l1 = document.createElement('div');
+  l1.textContent = `${FMTS[P.fmt].label} · ${fmtSize(size)} · файл готов`;
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.textContent = name;
+  const l2 = document.createElement('div');
+  l2.style.marginTop = '2px';
+  l2.appendChild(a);
+  const hint = document.createElement('div');
+  hint.className = 'dl-hint';
+  hint.textContent = 'загрузка не началась? кликните имя файла или правой кнопкой → «Сохранить ссылку как…»';
+  info.append(l1, l2, hint);
+}
+ $('saveAlt').innerHTML = window.showSaveFilePicker
+  ? '<a href="#" id="lnkPicker">сохранить через диалог «Сохранить как…»</a>'
+  : '';
+let lastBlob = null, lastName = '';
+ $('saveAlt').addEventListener('click', async e => {
+  const a = e.target.closest('#lnkPicker');
+  if (!a) return;
+  e.preventDefault();
+  const info = $('expInfo');
+  if (!lastBlob){ info.textContent = 'сначала соберите модель кнопкой «Скачать модель»'; return; }
+  try{
+    const h = await window.showSaveFilePicker({ suggestedName: lastName || buildFileName() });
+    const w = await h.createWritable();
+    await w.write(lastBlob);
+    await w.close();
+    info.className = 'ok';
+    info.textContent = `сохранено через диалог: ${h.name} · ${fmtSize(lastBlob.size)}`;
+  }catch(err){
+    if (err?.name === 'AbortError'){ info.className = ''; info.textContent = 'сохранение отменено'; }
+    else { info.className = 'err'; info.textContent = 'диалог недоступен: ' + (err?.message || err); }
+  }
+});
+ $('btnExport').addEventListener('click', () => {
+  const info = $('expInfo'), btn = $('btnExport');
+  btn.disabled = true;
+  try{
+    let which = R.what;
+    if (which !== 'main' && !Q.on) which = 'main';
+    const payload = P.fmt === 'dxf'
+      ? buildDXF(which)
+      : FMTS[P.fmt].make(collectSolid(which));
+    const blob = payload instanceof Blob
+      ? payload
+      : new Blob([payload], { type: P.fmt === 'dxf' ? 'application/dxf' : 'application/octet-stream' });
+    const nm = buildFileName();
+    lastBlob = blob; lastName = nm;
+    if (lastUrl) URL.revokeObjectURL(lastUrl);
+    lastUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = lastUrl;
+    a.download = nm;
+    a.rel = 'noopener';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    showDownloadResult(nm, lastUrl, blob.size);
+  }catch(err){
+    info.className = 'err';
+    info.textContent = 'ошибка экспорта: ' + (err?.message || err);
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+addEventListener('resize', () => {
+  if (!renderer) return;
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+/* ================= СТАРТ ================= */
+function loaderOff(){
+  const l = $('loader');
+  if (!l) return;
+  l.classList.add('off');
+  setTimeout(() => l.remove(), 700);
+}
+
+rebuild();
+if (renderer && camera){
+  introFrom.copy(camera.position);
+  camera.position.sub(controls.target).multiplyScalar(2.2).add(controls.target);
+}
+
+if (renderer){
+  const clock = new THREE.Clock();
+  let firstFrame = true;
+  function tick(){
+    requestAnimationFrame(tick);
+    const dt = Math.min(clock.getDelta(), .05);
+    if (introActive){
+      introT = Math.min(introT + dt/1.6, 1);
+      const e = 1 - Math.pow(1 - introT, 3);
+      camera.position.lerp(introFrom, e);
+      if (introT >= 1) introActive = false;
+    }
+    if (P.spin && !R.paused) ph1 -= P.rpm/60 * Math.PI*2 * dt;
+    applyTransforms();
+    controls.update();
+    renderer.render(scene, camera);
+    if (firstFrame){ firstFrame = false; loaderOff(); }
+  }
+  controls.addEventListener('start', () => introActive = false);
+  $('scene').addEventListener('dblclick', () => { introFrom.copy(camera.position); introT = 0; introActive = true; });
+  tick();
+}else{
+  loaderOff();
+}
+document.fonts.ready.then(scheduleRebuild);
+</script>
+</body>
+</html>
